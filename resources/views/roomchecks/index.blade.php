@@ -1,47 +1,82 @@
-{{--
-    Room inspection list, rendered by RoomCheckController@index ($rooms).
 
-    Delete uses a small form because HTML links can only send GET.
-    @method('DELETE') adds a hidden _method field that Laravel reads.
+<x-layout title="Room Inspections">
+    <header class="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+        <div>
+            <h1 class="text-3xl font-bold tracking-tight text-gray-900">
+                Room Inspections
+            </h1>
+            <p class="mt-2 text-gray-600">
+                Manage student room inspection records.
+            </p>
+        </div>
 
-    TODO: Use the shared layout, paginate, and style it like the events pages.
---}}
+        <a href="{{ route('roomcheck.create') }}"
+           class="inline-flex items-center justify-center rounded-lg bg-blue-700 px-5 py-3 font-semibold text-white hover:bg-blue-800">
+            + Add Inspection
+        </a>
+    </header>
 
+    <section class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div class="border-b border-gray-200 px-6 py-5">
+            <h2 class="text-lg font-semibold text-gray-900">
+                All Room Inspections
+            </h2>
+        </div>
 
-<h1>Room inspection</h1>
-<a href="{{ route('events.index') }}">Worship events</a>
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[580px] text-left">
+                <thead class="bg-gray-50 text-xs uppercase tracking-wide text-gray-500">
+                    <tr>
+                        <th class="px-6 py-4">Room ID</th>
+                        <th class="px-6 py-4">Student ID</th>
+                        <th class="px-6 py-4">Student Name</th>
+                        <th class="px-6 py-4">Actions</th>
+                    </tr>
+                </thead>
 
-<a href="{{ route('roomcheck.create') }}">
-    Add inspection
-</a>
-<table>
-    <tr>
-        <th>Room ID</th>
-        <th>Student ID</th>
-        <th>Student Name</th>
-        <th>Actions</th>
-    </tr>
+                <tbody class="divide-y divide-gray-100">
+                    @forelse ($rooms as $row)
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4">{{ $row->room_id }}</td>
+                            <td class="px-6 py-4">{{ $row->student_id }}</td>
+                            <td class="px-6 py-4 font-medium text-gray-800">
+                                {{ $row->student_name }}
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <a href="{{ route('roomcheck.edit', $row->id) }}"
+                                       class="font-medium text-blue-700 hover:underline">
+                                        Edit
+                                    </a>
 
-    @foreach ($rooms as $row)
-        <tr>
-            <td>
-                {{ $row->room_id }}
-            </td>
-            <td>
-                {{ $row->student_id }}
-            </td>
-            <td>
-                {{ $row->student_name }}
-            </td>
-            <td>
-                <a href="{{ route('roomcheck.edit', $row->id) }}">Edit</a>
-                <form action="{{ route('roomcheck.destroy', $row->id) }}" method="POST" onsubmit="return confirm('Delete this room inspection?');">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit">Delete</button>
-                </form>
-            </td>
-        </tr>
-    @endforeach
+                                    <form action="{{ route('roomcheck.destroy', $row->id) }}"
+                                          method="POST"
+                                          onsubmit="return confirm('Delete this room inspection?');">
+                                        @csrf
+                                        @method('DELETE')
 
-</table>
+                                        <button type="submit"
+                                                class="font-medium text-red-600 hover:underline">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="px-6 py-12 text-center">
+                                <p class="font-semibold text-gray-800">
+                                    No room inspections yet.
+                                </p>
+                                <p class="mt-2 text-gray-600">
+                                    Add your first inspection to get started.
+                                </p>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </section>
+</x-layout>
