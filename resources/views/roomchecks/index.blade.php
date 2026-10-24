@@ -79,4 +79,5 @@
             </table>
         </div>
     </section>
+    {{ $rooms->links() }}
 </x-layout>
