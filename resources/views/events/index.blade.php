@@ -83,7 +83,7 @@
                             </td>
 
                             <td class="px-6 py-4">
-                                <div class="flex gap-3">
+                                <div class="flex items-center gap-3">
                                     <a href="{{ route('events.show', $event) }}"
                                        class="text-sm font-medium text-blue-700 hover:underline">
                                         View
@@ -93,6 +93,18 @@
                                        class="text-sm font-medium text-green-700 hover:underline">
                                         Edit
                                     </a>
+
+                                    <form action="{{ route('events.destroy', $event) }}"
+                                          method="POST"
+                                          onsubmit="return confirm('Are you sure you want to delete this worship event?');">
+                                        @csrf
+                                        @method('DELETE')
+
+                                        <button type="submit"
+                                                class="text-sm font-medium text-red-700 hover:underline">
+                                            Delete
+                                        </button>
+                                    </form>
                                 </div>
                             </td>
                         </tr>
