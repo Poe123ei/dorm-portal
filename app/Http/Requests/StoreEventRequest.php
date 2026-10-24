@@ -44,7 +44,7 @@ class StoreEventRequest extends FormRequest
     {
         return [
             'title' => ['required', 'string', 'max:255'],
-            'dorm' => ['required', 'string', 'max:255'],
+            'dorm' => ['required', 'string', 'max:255', Rule::in(config('dorms.names'))],
             'date' => ['required', 'date_format:Y-m-d'],
             'session' => ['required', Rule::in(['morning', 'evening'])],
         ];
