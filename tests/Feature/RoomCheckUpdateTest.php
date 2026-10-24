@@ -14,13 +14,11 @@ uses(RefreshDatabase::class);
 
 function existingRoomCheck(): RoomCheck
 {
-    $roomCheck = new RoomCheck;
-    $roomCheck->room_id = 101;
-    $roomCheck->student_id = 42;
-    $roomCheck->student_name = 'Jane Doe';
-    $roomCheck->save();
-
-    return $roomCheck;
+    return RoomCheck::factory()->create([
+        'room_id' => 101,
+        'student_id' => 42,
+        'student_name' => 'Jane Doe',
+    ]);
 }
 
 it('shows an edit form with the current values', function () {
