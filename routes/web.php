@@ -26,4 +26,4 @@ Route::view('/', 'welcome')->name('home');
 Route::resource('roomcheck', RoomCheckController::class);
 
 // TODO: Extend to the full resource (show, edit, update, destroy).
-Route::resource('events', EventController::class)->only(['index', 'create', 'store']);
+Route::resource('events', EventController::class)->only(['index', 'create', 'store' ,'show']);
