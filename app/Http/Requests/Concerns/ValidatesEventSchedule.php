@@ -1,43 +1,70 @@
-
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Concerns;
 
-use App\Http\Requests\Concerns\ValidatesEventSchedule;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
+use App\Models\Event;
+use App\Support\ThailandHolidays;
+use Carbon\CarbonImmutable;
 use Illuminate\Validation\Validator;
 
-class StoreEventRequest extends FormRequest
+trait ValidatesEventSchedule
 {
-    use ValidatesEventSchedule;
-
-    public function authorize(): bool
+    public function validateEventSchedule(Validator $validator): void
     {
-        return true;
-    }
+        if (
+            $validator->errors()->has('date') ||
+            $validator->errors()->has('session')
+        ) {
+            return;
+        }
 
-    public function rules(): array
-    {
-        return [
-            'title' => ['required', 'string', 'max:255'],
-            'dorm' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::in(config('dorms.names')),
-            ],
-            'date' => ['required', 'date_format:Y-m-d'],
-            'session' => ['required', Rule::in(['morning', 'evening'])],
-        ];
-    }
+        $date = $this->input('date');
+        $session = $this->input('session');
+        $day = CarbonImmutable::parse($date)->dayOfWeekIso;
 
-    public function after(): array
-    {
-        return [
-            function (Validator $validator) {
-                $this->validateEventSchedule($validator);
-            },
-        ];
+        if (ThailandHolidays::isHoliday($date)) {
+            $holiday = ThailandHolidays::DATES[$date];
+
+            $validator->errors()->add(
+                'date',
+                "No worship on holidays: {$holiday}."
+            );
+
+            return;
+        }
+
+        if ($day >= 6) {
+            $validator->errors()->add(
+                'date',
+                'There is no worship check-in on Saturday or Sunday.'
+            );
+        } elseif (
+            ($day === 1 && $session !== 'evening') ||
+            ($day >= 2 && $session !== 'morning')
+        ) {
+            $validator->errors()->add(
+                'session',
+                'Choose evening on Monday or morning on Tuesday through Friday.'
+            );
+        }
+
+        if ($validator->errors()->isEmpty()) {
+            $query = Event::query()
+                ->where('dorm', $this->input('dorm'))
+                ->whereDate('date', $date);
+
+            $event = $this->route('event');
+
+            if ($event instanceof Event) {
+                $query->where('id', '!=', $event->id);
+            }
+
+            if ($query->exists()) {
+                $validator->errors()->add(
+                    'date',
+                    'This dorm already has a worship event on this date.'
+                );
+            }
+        }
     }
 }
