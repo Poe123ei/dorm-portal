@@ -47,7 +47,7 @@
                     <select id="dorm" name="dorm" required
                             class="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 focus:border-blue-500 focus:outline-none">
                         <option value="">Choose a dorm</option>
-                        @foreach (['Eve Hall', 'Esther Hall', 'Ruth Hall', 'Elijah Hall', 'Solomon Hall', 'Sarah Hall'] as $dorm)
+                        @foreach (config('dorms.names') as $dorm)
                             <option value="{{ $dorm }}" @selected(old('dorm') === $dorm)>
                                 {{ $dorm }}
                             </option>
